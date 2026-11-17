@@ -15,7 +15,8 @@
     "web": "npm run dev -w apps/web",
     "register": "tsx scripts/register-agent.ts",
     "buyer": "tsx scripts/buyer.ts",
-    "build:web": "npm run build -w apps/web"
+    "build:web": "npm run build -w apps/web",
+    "keys:import": "tsx scripts/import-key.ts"
   },
   "engines": {
     "node": ">=20"
