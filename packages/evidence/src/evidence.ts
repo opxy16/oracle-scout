@@ -51,6 +51,27 @@ export interface EvidenceItem {
   createdAt: string;
   /** Stable across re-runs on the same data: (market, series, latest observation, stance). */
   fingerprint: string;
+  /** sha256 of the canonical JSON of this item (without this field); committed in the audit log. */
+  contentHash?: string;
+}
+
+function sortDeep(v: unknown): unknown {
+  if (Array.isArray(v)) return v.map(sortDeep);
+  if (v && typeof v === "object") {
+    return Object.fromEntries(
+      Object.keys(v as object)
+        .sort()
+        .filter((k) => (v as Record<string, unknown>)[k] !== undefined)
+        .map((k) => [k, sortDeep((v as Record<string, unknown>)[k])]),
+    );
+  }
+  return v;
+}
+
+/** Same canonical-JSON sha256 as @oracle-scout/ledger's hashObject, kept local so this package stands alone. */
+export function evidenceHash(item: EvidenceItem): string {
+  const { contentHash: _omit, ...rest } = item;
+  return sha(JSON.stringify(sortDeep(rest)));
 }
 
 export type MineResult =
@@ -255,7 +276,8 @@ export async function mine(market: Market, plan: ResolverPlan, deps: MineDeps): 
     createdAt,
     fingerprint,
   };
-  await rec.record("evidence.created", { evidenceId: item.id, marketId: market.id, stance, probability: pYes, claim: headline, fingerprint });
+  item.contentHash = evidenceHash(item);
+  await rec.record("evidence.created", { evidenceId: item.id, marketId: market.id, stance, probability: pYes, claim: headline, fingerprint, contentHash: item.contentHash });
   return { status: "evidence", item };
 }
 

@@ -6,7 +6,8 @@ dist/
 !.env.example
 *.export
 keys/
-data/private/
+data/*
+!data/plans.json
 coverage/
 *.tsbuildinfo
 .vercel

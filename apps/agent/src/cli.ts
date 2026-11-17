@@ -9,6 +9,10 @@ import { DelphiHttp, DryRunSink, FileMarkets, delphiConfigFromEnv, type MarketSo
 import { killSwitch } from "./guardrails.js";
 import { anchorPending, refreshReceipts, runOnce, type Anchorer } from "./runner.js";
 import { AgentState } from "./state.js";
+import { publish } from "./publish.js";
+import { randomBytes } from "node:crypto";
+import { appendFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 
 loadEnv();
 const cfg = readConfig();
@@ -124,6 +128,31 @@ const commands: Record<string, () => Promise<void>> = {
     }
   },
 
+  async keygen() {
+    if (process.env.OS_PACK_KEY) {
+      console.log("OS_PACK_KEY already set in .env; leaving it unchanged.");
+      return;
+    }
+    await appendFile(resolve(".env"), `\n# Evidence-pack encryption key (copy to the web app's env as OS_PACK_KEY). Never commit.\nOS_PACK_KEY=${randomBytes(32).toString("base64")}\n`);
+    console.log("Wrote a new OS_PACK_KEY to .env (git-ignored). Add the same value to the web deployment's environment.");
+  },
+
+  async publish() {
+    const out = resolve(process.env.OS_PUBLIC_LEDGER_DIR ?? "ledger");
+    const r = await publish(cfg, state, out);
+    console.log(`Published ${r.entries} log entries and ${r.packs} sealed packs to ${out}`);
+    if (flag("--push")) {
+      const git = (...a: string[]) => execFileSync("git", a, { stdio: "inherit" });
+      git("add", out);
+      try {
+        git("commit", "-m", `Publish ledger: ${r.entries} entries, ${r.packs} packs`);
+        git("push");
+      } catch {
+        console.log("(nothing new to commit, or push failed; see git output above)");
+      }
+    }
+  },
+
   async status() {
     const subs = await state.submissions();
     const entries = await log.entries();
@@ -151,6 +180,8 @@ const commands: Record<string, () => Promise<void>> = {
   verify                       recompute the audit log hash chain
   export [dir] [--redact]      EU AI Act Art. 12-style export (JSON + CSV)
   kill on [reason] | kill off  engage / release the kill switch
+  keygen                       create the evidence-pack encryption key in .env
+  publish [--push]             write the public ledger (log + sealed packs) to ./ledger, optionally git push
   status                       counts, anchors, kill switch`);
   },
 };
