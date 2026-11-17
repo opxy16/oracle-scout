@@ -16,7 +16,8 @@
     "register": "tsx scripts/register-agent.ts",
     "buyer": "tsx scripts/buyer.ts",
     "build:web": "npm run build -w apps/web",
-    "keys:import": "tsx scripts/import-key.ts"
+    "keys:import": "tsx scripts/import-key.ts",
+    "keys:vercel": "node scripts/vercel-wallet.mjs"
   },
   "engines": {
     "node": ">=20"

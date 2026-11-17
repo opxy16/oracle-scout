@@ -179,7 +179,7 @@ npm run agent -- publish --push
 - Environment variables:
   - `OS_PACK_KEY`: same value as in `.env`.
   - `OS_PAYTO`: the agent account address.
-  - `CONCORDIUM_SPONSOR_WALLET_JSON`: the sponsor's wallet export **contents**, as a secret.
+  - `CONCORDIUM_SPONSOR_WALLET_B64`: the sponsor wallet export as one base64 line (`keys/sponsor.vercel-b64.txt`, produced by `npm run keys:vercel`), as a secret. `CONCORDIUM_SPONSOR_WALLET_JSON` also works but multi-line values are easy to mangle.
   - `OS_PACK_PRICE_MICROCCD`: optional pack price in microCCD.
   - `LEDGER_BASE_URL`: optional; defaults to this repo's `ledger/` on GitHub.
 

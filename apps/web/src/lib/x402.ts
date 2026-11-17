@@ -9,7 +9,8 @@ export function sellerConfig() {
   const payTo = process.env.OS_PAYTO ?? process.env.OS_OWNER_ACCOUNT;
   if (!payTo) throw new Error("OS_PAYTO (seller account address) not configured");
   if (!sponsor) {
-    const json = process.env.CONCORDIUM_SPONSOR_WALLET_JSON;
+    const b64 = process.env.CONCORDIUM_SPONSOR_WALLET_B64?.trim();
+    const json = b64 ? Buffer.from(b64, "base64").toString("utf8") : process.env.CONCORDIUM_SPONSOR_WALLET_JSON;
     const path = process.env.CONCORDIUM_SPONSOR_WALLET;
     if (json) sponsor = walletFromJson(json);
     else if (path) sponsor = loadWalletExport(path);
