@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 246 247 251;
+  --panel: 255 255 255;
+  --ink: 17 24 39;
+  --muted: 100 110 130;
+  --line: 226 230 238;
+  --accent: 202 138 4;
+  --verify: 5 150 105;
+  --no: 220 38 38;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: 8 11 20;
+    --panel: 15 20 33;
+    --ink: 232 236 244;
+    --muted: 140 150 172;
+    --line: 33 41 61;
+    --accent: 245 182 66;
+    --verify: 52 211 153;
+    --no: 248 113 113;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: 8 11 20;
+  --panel: 15 20 33;
+  --ink: 232 236 244;
+  --muted: 140 150 172;
+  --line: 33 41 61;
+  --accent: 245 182 66;
+  --verify: 52 211 153;
+  --no: 248 113 113;
+}
+
+html,
+body {
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+}
+
+.panel {
+  @apply rounded-2xl border bg-[rgb(var(--panel))] border-[rgb(var(--line))];
+}
+
+.grid-bg {
+  background-image: linear-gradient(rgb(var(--line) / 0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--line) / 0.45) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at top, black 30%, transparent 75%);
+}
+
+.hash {
+  @apply font-mono text-[11px] tracking-tight text-[rgb(var(--muted))];
+}
+
+::selection {
+  background: rgb(var(--accent) / 0.3);
+}

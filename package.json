@@ -12,7 +12,10 @@
     "test": "vitest run",
     "typecheck": "tsc -b",
     "agent": "tsx apps/agent/src/cli.ts",
-    "web": "npm run dev -w apps/web"
+    "web": "npm run dev -w apps/web",
+    "register": "tsx scripts/register-agent.ts",
+    "buyer": "tsx scripts/buyer.ts",
+    "build:web": "npm run build -w apps/web"
   },
   "engines": {
     "node": ">=20"

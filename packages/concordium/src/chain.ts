@@ -29,7 +29,12 @@ export interface Account {
 }
 
 export function loadWalletExport(path: string): Account {
-  const wallet = parseWallet(readFileSync(path, "utf8"));
+  return walletFromJson(readFileSync(path, "utf8"));
+}
+
+/** Same as loadWalletExport, from the file's contents (e.g. a secret env var on a host without files). */
+export function walletFromJson(json: string): Account {
+  const wallet = parseWallet(json);
   return { address: wallet.value.address, signer: buildAccountSigner(wallet) };
 }
 
