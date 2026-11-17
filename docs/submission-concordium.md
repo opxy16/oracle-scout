@@ -9,7 +9,8 @@
 - Agent registration (CIS-8004 `register`): https://ccdexplorer.io/testnet/transaction/f274c96413174dbc970b6b9535cb38d4403baac9831d47e15abe3c93933bba59
 - Badge card hash pinned (`setAgentURI`): https://ccdexplorer.io/testnet/transaction/525206e32406b798a0597189c8b6804794fc4856a534bf07a75548882731adc5
 - First audit-log anchor (RegisterData, Merkle root of entries 0–18): https://ccdexplorer.io/testnet/transaction/e3c2bf74bbf03176c20d2be73986a3344c4fdc991b13e26b370b9b1655f5016e
-- x402 evidence-pack sale (sponsored CCD transfer, buyer paid no fee): https://ccdexplorer.io/testnet/transaction/352ff47de8844ffa9524c105a6f0f900bbc81bf83ac4a1283b9176d84047cd65
+- x402 evidence-pack sale (local server) (sponsored CCD transfer, buyer paid no fee): https://ccdexplorer.io/testnet/transaction/352ff47de8844ffa9524c105a6f0f900bbc81bf83ac4a1283b9176d84047cd65
+- x402 evidence-pack sale on the live deployment: https://ccdexplorer.io/testnet/transaction/0e6ca73107c05931cb7a133fcf61c1e43ffe37a72f22219df8caa9b6075b7e0b
 **Demo video:** _link_ (≤ 3 min, script in docs/demo-video-script.md)
 
 ## What it is (short)
