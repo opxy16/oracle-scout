@@ -2,8 +2,14 @@
 
 **Project:** Oracle Scout
 **Repo:** https://github.com/opxy16/oracle-scout
-**Live:** https://oracle-scout.vercel.app (set to the final deployment URL)
-**CCDExplorer:** _agent registration tx_ · _latest anchor tx_ · _x402 settlement tx_ (fill in after the testnet runs)
+**Live:** https://web-gilt-phi-11.vercel.app
+**Agent Registry:** agent #1253, badge `JyP9YD4TswwGeC8X8An8Z` ([check it](https://agent-registry-mcp.concordium.com/v1/check-badge/JyP9YD4TswwGeC8X8An8Z?network=testnet))
+**CCDExplorer (testnet):**
+- Owner / agent account: https://ccdexplorer.io/testnet/account/3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1
+- Agent registration (CIS-8004 `register`): https://ccdexplorer.io/testnet/transaction/f274c96413174dbc970b6b9535cb38d4403baac9831d47e15abe3c93933bba59
+- Badge card hash pinned (`setAgentURI`): https://ccdexplorer.io/testnet/transaction/525206e32406b798a0597189c8b6804794fc4856a534bf07a75548882731adc5
+- First audit-log anchor (RegisterData, Merkle root of entries 0–18): https://ccdexplorer.io/testnet/transaction/e3c2bf74bbf03176c20d2be73986a3344c4fdc991b13e26b370b9b1655f5016e
+- x402 evidence-pack sale (sponsored CCD transfer, buyer paid no fee): https://ccdexplorer.io/testnet/transaction/352ff47de8844ffa9524c105a6f0f900bbc81bf83ac4a1283b9176d84047cd65
 **Demo video:** _link_ (≤ 3 min, script in docs/demo-video-script.md)
 
 ## What it is (short)

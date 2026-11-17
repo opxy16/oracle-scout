@@ -40,7 +40,7 @@ async function main() {
 
   step(2, "Checking the badge with the Concordium Agent Registry");
   const check = await checkBadgeRest(badge, "testnet");
-  console.log(`    badge_valid=${check.badge_valid} extension_conformant=${check.extension_conformant} issues=${JSON.stringify(check.issues ?? [])}`);
+  console.log(`    badge_valid=${check.badge_valid} extension_conformant=${(check.checks as { extension_conformant?: boolean } | undefined)?.extension_conformant ?? check.extension_conformant} issues=${JSON.stringify(check.issues ?? [])}`);
   if (!check.badge_valid) throw new Error("Badge is not valid. Refusing to pay.");
 
   step(3, `Requesting ${url} (paying over x402 if asked, cap ${Number(MAX) / 1e6} CCD)`);
