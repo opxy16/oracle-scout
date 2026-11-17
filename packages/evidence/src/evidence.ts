@@ -140,7 +140,6 @@ export function fmtValue(v: number, unit = ""): string {
   return money ? `$${scaled}` : `${scaled}${unit && unit !== "index" ? ` ${unit}` : ""}`;
 }
 
-const PERIOD_WORD: Record<string, string> = { intraday: "hour", daily: "day", weekly: "week", monthly: "month", quarterly: "quarter", annual: "year", irregular: "period" };
 
 const MONTH_NAMES = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 
@@ -228,12 +227,10 @@ export async function mine(market: Market, plan: ResolverPlan, deps: MineDeps): 
       }
     }
   } else {
-    const periodDays = { intraday: 1 / 24, daily: 1, weekly: 7, monthly: 30.4, quarterly: 91, annual: 365, irregular: 30 }[series.frequency];
-    const periodsAhead = Math.max(days / periodDays, 0.5);
-    odds = trendThresholdOdds({ series, threshold: plan.threshold, periodsAhead, window: trend.window });
+    odds = trendThresholdOdds({ series, threshold: plan.threshold, asOf: latest.date, deadline: plan.deadline, window: trend.window });
     pYes = plan.comparator === "above" ? odds.probability : 1 - odds.probability;
     framing =
-      `Over the last ${trend.window} observations the series is ${trend.direction} (${trend.slopePerPeriod >= 0 ? "+" : ""}${fmtValue(trend.slopePerPeriod, series.unit)} per ${PERIOD_WORD[series.frequency]}); ` +
+      `Over the last ${trend.window} observations the series is ${trend.direction} (${Number(odds.inputs.slopePerDay) >= 0 ? "+" : ""}${fmtValue(Number(odds.inputs.slopePerDay), series.unit)} per day over ${odds.inputs.windowDays} days); ` +
       `extrapolated to ${plan.deadline.slice(0, 10)} it reaches ${fmtValue(Number(odds.inputs.projected), series.unit)} against a threshold of ${fmtValue(plan.threshold, series.unit)}.`;
   }
 

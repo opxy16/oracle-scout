@@ -261,11 +261,12 @@ export async function fetchSeries(ref: SeriesRef, http: HttpGet): Promise<Series
   return series;
 }
 
-function guessFrequency(obs: Observation[]): Frequency {
+/** Median gap of the last observations, so weekends and holidays don't make a daily series look weekly. */
+export function guessFrequency(obs: Observation[]): Frequency {
   if (obs.length < 3) return "irregular";
-  const a = Date.parse(obs[obs.length - 2]!.date);
-  const b = Date.parse(obs[obs.length - 1]!.date);
-  const days = Math.abs(b - a) / 86_400_000;
+  const recent = obs.slice(-15);
+  const gaps = recent.slice(1).map((o, i) => Math.abs(Date.parse(o.date) - Date.parse(recent[i]!.date)) / 86_400_000).sort((x, y) => x - y);
+  const days = gaps[Math.floor(gaps.length / 2)]!;
   if (days <= 1.5) return "daily";
   if (days <= 8) return "weekly";
   if (days <= 32) return "monthly";

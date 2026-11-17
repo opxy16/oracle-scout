@@ -178,17 +178,42 @@ export function nextPrintOdds(args: {
   };
 }
 
-/** Generic level series: extrapolate the OLS trend to the deadline, use residual spread as uncertainty. */
-export function trendThresholdOdds(args: { series: Series; threshold: number; periodsAhead: number; window?: number }): ThresholdOdds {
-  const values = args.series.observations.slice(-(args.window ?? 24)).map((o) => o.value);
-  const { slope, intercept, residualSd } = olsSlope(values);
-  const projected = intercept + slope * (values.length - 1 + args.periodsAhead);
-  const sd = Math.max(residualSd * Math.sqrt(1 + args.periodsAhead / values.length), 1e-9);
+/** OLS of y on x (x in any unit, e.g. days). */
+export function olsXY(xs: number[], ys: number[]): { slope: number; intercept: number; residualSd: number } {
+  const n = xs.length;
+  if (n < 2) return { slope: 0, intercept: ys[0] ?? 0, residualSd: 0 };
+  const xm = mean(xs);
+  const ym = mean(ys);
+  let sxy = 0;
+  let sxx = 0;
+  xs.forEach((x, i) => {
+    sxy += (x - xm) * (ys[i]! - ym);
+    sxx += (x - xm) ** 2;
+  });
+  const slope = sxx ? sxy / sxx : 0;
+  const intercept = ym - slope * xm;
+  return { slope, intercept, residualSd: stdev(ys.map((y, i) => y - (intercept + slope * xs[i]!))) };
+}
+
+/**
+ * Generic level series: fit the trend against calendar time (so business-day or irregular
+ * series are handled correctly), extrapolate to the deadline, use residual spread as uncertainty.
+ */
+export function trendThresholdOdds(args: { series: Series; threshold: number; asOf: string; deadline: string; window?: number }): ThresholdOdds {
+  const obs = args.series.observations.slice(-(args.window ?? 24));
+  const t0 = Date.parse(obs[0]!.date);
+  const xs = obs.map((o) => (Date.parse(o.date) - t0) / 86_400_000);
+  const { slope, intercept, residualSd } = olsXY(xs, obs.map((o) => o.value));
+  const span = xs[xs.length - 1]! || 1;
+  const tDeadline = (Date.parse(args.deadline) - t0) / 86_400_000;
+  const daysAhead = Math.max(tDeadline - span, 0);
+  const projected = intercept + slope * tDeadline;
+  const sd = Math.max(residualSd * Math.sqrt(1 + daysAhead / span), 1e-9);
   // Trend extrapolation ignores regime changes, so never claim more than 97% either way.
   return {
     probability: Math.min(0.97, Math.max(0.03, 1 - normCdf((args.threshold - projected) / sd))),
     method: "OLS trend extrapolation with residual spread",
-    inputs: { projected: +projected.toFixed(4), sd: +sd.toFixed(4), slopePerPeriod: +slope.toFixed(5), periodsAhead: args.periodsAhead },
+    inputs: { projected: +projected.toFixed(4), sd: +sd.toFixed(4), slopePerDay: +slope.toFixed(5), daysAhead: +daysAhead.toFixed(2), windowDays: +span.toFixed(1) },
   };
 }
 

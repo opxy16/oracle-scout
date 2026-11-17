@@ -13,6 +13,8 @@ import {
   type Market,
   type Recorder,
   type Series,
+  guessFrequency,
+  trendThresholdOdds,
 } from "../src/index.js";
 
 const NOW = new Date("2026-11-20T12:00:00Z");
@@ -167,5 +169,35 @@ describe("novelty", () => {
     expect(checkNovelty(item, [{ marketId: "m1", text: "x", stance: "YES", own: true }])).toMatchObject({ novel: false, reason: expect.stringMatching(/stance lock/) });
     expect(checkNovelty(item, [{ marketId: "m1", text: item.note }])).toMatchObject({ novel: false });
     expect(checkNovelty(item, [{ marketId: "m2", text: item.note }])).toEqual({ novel: true });
+  });
+});
+
+describe("business-day series (regression: weekend gap read as weekly)", () => {
+  // +10 per business day, Mon–Fri only
+  const obs: { date: string; value: number }[] = [];
+  let v = 1000;
+  for (let d = new Date("2026-09-01T00:00:00Z"); obs.length < 40; d.setUTCDate(d.getUTCDate() + 1)) {
+    const wd = d.getUTCDay();
+    if (wd === 0 || wd === 6) continue;
+    obs.push({ date: d.toISOString().slice(0, 10), value: (v += 10) });
+  }
+  const series: Series = {
+    ref: { source: "x", id: "y" },
+    title: "t",
+    unit: "USD",
+    frequency: guessFrequency(obs),
+    observations: obs,
+    provenance: { publisher: "p", sourceUrl: "", dataUrl: "", retrievedAt: "", contentHash: "" },
+  };
+  it("is detected as daily even when it ends after a weekend", () => {
+    expect(series.frequency).toBe("daily");
+  });
+  it("extrapolates on calendar time", () => {
+    const last = obs[obs.length - 1]!;
+    const deadline = new Date(Date.parse(last.date) + 28 * 86_400_000).toISOString();
+    const o = trendThresholdOdds({ series, threshold: last.value + 150, asOf: last.date, deadline, window: 24 });
+    // 28 calendar days = 20 business days = +200 expected, so +150 should be likely
+    expect(Number(o.inputs.projected)).toBeGreaterThan(last.value + 180);
+    expect(o.probability).toBeGreaterThan(0.8);
   });
 });
