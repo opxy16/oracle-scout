@@ -1,0 +1,112 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "Oracle Scout",
+  "description": "Accountable evidence agent. Reads official data series, computes the odds, and submits dated, quoted, sourced evidence to forecasting markets. Every step is hash-chained and anchored on Concordium; full evidence packs are sold over x402.",
+  "url": "https://web-gilt-phi-11.vercel.app/.well-known/agent-card.json",
+  "version": "1.0.0",
+  "defaultInputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "text/markdown",
+    "application/json"
+  ],
+  "authentication": {
+    "schemes": []
+  },
+  "skills": [
+    {
+      "id": "primary-data-evidence",
+      "name": "Primary-data evidence",
+      "description": "Dated, quoted, sourced evidence for yes/no forecasting questions that an official data series can settle (CPI, jobs, rates, debt, crypto prices, weather).",
+      "tags": [
+        "forecasting",
+        "evidence",
+        "data"
+      ]
+    },
+    {
+      "id": "evidence-packs",
+      "name": "Evidence packs over x402",
+      "description": "Full evidence bundle per market with raw quotes, model inputs, and Merkle proofs against Concordium anchors. Paid in CCD via x402.",
+      "tags": [
+        "x402",
+        "payments",
+        "concordium"
+      ]
+    },
+    {
+      "id": "audit-proofs",
+      "name": "Audit-log proofs",
+      "description": "Hash-chained audit log with Merkle roots anchored on Concordium; EU AI Act Article 12-style export.",
+      "tags": [
+        "accountability",
+        "audit",
+        "eu-ai-act"
+      ]
+    }
+  ],
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [
+      {
+        "uri": "https://docs.concordium.com/a2a-extensions/concordium-badge/v1",
+        "description": "Verified by Concordium badge — on-chain agent identity in a CIS-8004 registry",
+        "required": false,
+        "params": {
+          "tokenAddress": null,
+          "owner": {
+            "account": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1"
+          },
+          "agentWallet": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1",
+          "contracts": {
+            "cis8004": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0",
+            "cis8": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12801.0"
+          },
+          "services": {
+            "mcp": "https://web-gilt-phi-11.vercel.app/api/mcp",
+            "a2a": "https://web-gilt-phi-11.vercel.app/api/a2a",
+            "x402": "https://web-gilt-phi-11.vercel.app/api/packs/{marketId}",
+            "auditLog": "https://web-gilt-phi-11.vercel.app/api/ledger"
+          },
+          "verify": "Resolve tokenAddress via CIS-8004 agent_of; confirm owner + status=Active + card SHA-256 == metadata_hash.",
+          "verification": {
+            "service": "Concordium Agent Registry",
+            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/badge-check/3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1",
+            "mcp": "https://agent-registry-mcp.concordium.com/mcp",
+            "docs": "https://docs.concordium.com/en/mainnet/technical-reference/agent-registry/concordium-badge.html"
+          }
+        }
+      }
+    ]
+  },
+  "image": "https://web-gilt-phi-11.vercel.app/cover.png",
+  "provider": {
+    "organization": "Oracle Scout",
+    "url": "https://github.com/opxy16/oracle-scout"
+  },
+  "documentationUrl": "https://github.com/opxy16/oracle-scout#readme",
+  "supportedInterfaces": [
+    {
+      "url": "https://web-gilt-phi-11.vercel.app/api/a2a",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "services": [
+    {
+      "name": "A2A",
+      "endpoint": "https://web-gilt-phi-11.vercel.app/.well-known/agent-card.json",
+      "version": "1.0"
+    },
+    {
+      "name": "MCP",
+      "endpoint": "https://web-gilt-phi-11.vercel.app/api/mcp",
+      "version": "2025-06-18"
+    }
+  ],
+  "x402Support": true,
+  "active": true
+}
