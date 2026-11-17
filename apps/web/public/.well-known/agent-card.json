@@ -56,7 +56,7 @@
         "description": "Verified by Concordium badge — on-chain agent identity in a CIS-8004 registry",
         "required": false,
         "params": {
-          "tokenAddress": null,
+          "tokenAddress": "ccd:4221332d34e1694168c2a0c0b3fd0f27/cis-2:JyP9YD4TswwGeC8X8An8Z",
           "owner": {
             "account": "ccd:4221332d34e1694168c2a0c0b3fd0f27:3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1"
           },
@@ -74,7 +74,7 @@
           "verify": "Resolve tokenAddress via CIS-8004 agent_of; confirm owner + status=Active + card SHA-256 == metadata_hash.",
           "verification": {
             "service": "Concordium Agent Registry",
-            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/badge-check/3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1",
+            "verifyUrl": "https://agent-registry-mcp.concordium.com/v1/badge-check/JyP9YD4TswwGeC8X8An8Z",
             "mcp": "https://agent-registry-mcp.concordium.com/mcp",
             "docs": "https://docs.concordium.com/en/mainnet/technical-reference/agent-registry/concordium-badge.html"
           }
@@ -82,6 +82,12 @@
       }
     ]
   },
+  "registrations": [
+    {
+      "agentId": 1253,
+      "agentRegistry": "ccd:4221332d34e1694168c2a0c0b3fd0f27:12802.0"
+    }
+  ],
   "image": "https://web-gilt-phi-11.vercel.app/cover.png",
   "provider": {
     "organization": "Oracle Scout",

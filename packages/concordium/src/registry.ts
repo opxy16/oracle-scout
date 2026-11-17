@@ -52,7 +52,7 @@ export class RegistryMcp {
   }
 
   agentsByOwner(owner: string) {
-    return this.call<Record<string, unknown>>("agents_by_owner", { owner });
+    return this.call<Record<string, unknown>>("agents_by_owner", { owner_account: owner });
   }
 
   tokenAddress(tokenId: number) {

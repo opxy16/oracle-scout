@@ -1,0 +1,70 @@
+[
+  {
+    "marketId": "rehearsal-debt",
+    "question": "Will US national debt exceed $41 trillion by December 31, 2026?",
+    "stance": "NO",
+    "probability": 0.03,
+    "items": 1,
+    "itemHashes": [
+      "b435d78393c375c3356e2495b40788591cafcb1457326e4717e07c6c2211ced4"
+    ],
+    "evidenceIds": [
+      "fd270760008b91f7216d30ac"
+    ],
+    "firstAt": "2026-11-17T23:11:29.602Z",
+    "lastAt": "2026-11-17T23:11:29.602Z",
+    "submittedLive": false,
+    "file": "packs/rehearsal-debt.json"
+  },
+  {
+    "marketId": "rehearsal-eth-1k",
+    "question": "Will Ethereum drop below $1,000 by December 31, 2026?",
+    "stance": "NO",
+    "probability": 0.001,
+    "items": 1,
+    "itemHashes": [
+      "e166743afa867b322094b825f94fe0b0a1cd97ac4d711dbc95151b26fd58e250"
+    ],
+    "evidenceIds": [
+      "f943e553a0ef0ba7bae74d98"
+    ],
+    "firstAt": "2026-11-17T23:11:29.128Z",
+    "lastAt": "2026-11-17T23:11:29.128Z",
+    "submittedLive": false,
+    "file": "packs/rehearsal-eth-1k.json"
+  },
+  {
+    "marketId": "rehearsal-btc-150k",
+    "question": "Will Bitcoin close above $150,000 on December 31, 2026?",
+    "stance": "NO",
+    "probability": 0.001,
+    "items": 1,
+    "itemHashes": [
+      "e0956fc1c5039e21ec5f15fb5e707189fa56a686b21a96ee001d591a4eb85479"
+    ],
+    "evidenceIds": [
+      "d6dd00adb25c2d245244f0d0"
+    ],
+    "firstAt": "2026-11-17T23:11:27.287Z",
+    "lastAt": "2026-11-17T23:11:27.287Z",
+    "submittedLive": false,
+    "file": "packs/rehearsal-btc-150k.json"
+  },
+  {
+    "marketId": "rehearsal-cpi-oct",
+    "question": "Will US CPI inflation for October 2026 be above 3.5%?",
+    "stance": "YES",
+    "probability": 0.99,
+    "items": 1,
+    "itemHashes": [
+      "0c499dc5c3cec897b01981f6dc34fe264e07d5966e45aefe94f526e00d584698"
+    ],
+    "evidenceIds": [
+      "8d5dda3e0ca5b4eeb8cfdee3"
+    ],
+    "firstAt": "2026-11-17T23:11:25.754Z",
+    "lastAt": "2026-11-17T23:11:25.754Z",
+    "submittedLive": false,
+    "file": "packs/rehearsal-cpi-oct.json"
+  }
+]

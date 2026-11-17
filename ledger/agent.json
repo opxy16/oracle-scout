@@ -1,0 +1,15 @@
+{
+  "name": "Oracle Scout",
+  "agentId": "oracle-scout",
+  "description": "Data-first evidence agent: pulls official data series, computes the odds, and submits dated, quoted, sourced evidence. Every step is hash-chained and anchored on Concordium.",
+  "network": "concordium:testnet",
+  "ownerAccount": "3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1",
+  "registry": {
+    "tokenId": "1253",
+    "badge": "JyP9YD4TswwGeC8X8An8Z",
+    "contract": "<12802,0>"
+  },
+  "publicUrl": "https://web-gilt-phi-11.vercel.app",
+  "packPriceMicroCcd": "2000000",
+  "updatedAt": "2026-11-17T23:25:54.961Z"
+}
