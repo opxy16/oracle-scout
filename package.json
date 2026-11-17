@@ -1,0 +1,27 @@
+{
+  "name": "oracle-scout",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Accountable, data-first evidence agent: primary-data evidence, Merkle-anchored audit log on Concordium, x402 evidence packs, MCP + A2A.",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -b",
+    "agent": "tsx apps/agent/src/cli.ts",
+    "web": "npm run dev -w apps/web"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}

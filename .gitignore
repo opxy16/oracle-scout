@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.next/
+.env
+.env.*
+!.env.example
+*.export
+keys/
+data/private/
+coverage/
+*.tsbuildinfo
+.vercel
