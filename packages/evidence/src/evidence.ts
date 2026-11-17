@@ -96,16 +96,30 @@ async function load(plan: ResolverPlan, deps: MineDeps): Promise<Series> {
     });
     return s;
   };
-  try {
-    return await tryRef(plan.ref);
-  } catch (err) {
-    if (plan.kind === "next-print" && plan.fallback) {
-      await rec.record("error", { stage: "fetch", ref: plan.ref, message: (err as Error).message, recovery: "fallback series" });
-      return tryRef(plan.fallback);
+  const refs = [plan.ref, ...(plan.fallback ? [plan.fallback].flat() : [])];
+  let lastErr: unknown;
+  for (const [i, ref] of refs.entries()) {
+    try {
+      const s = await tryRef(ref);
+      if (s.title === ref.id) s.title = plan.label;
+      return s;
+    } catch (err) {
+      lastErr = err;
+      if (i < refs.length - 1) await rec.record("error", { stage: "fetch", ref, message: (err as Error).message, recovery: "fallback series" });
     }
-    throw err;
   }
+  throw lastErr;
 }
+
+/** Human-scale number: $40.617 trillion, 63,662.28, 3.91. */
+export function fmtValue(v: number, unit = ""): string {
+  const a = Math.abs(v);
+  const money = /^(usd|\$)$/i.test(unit);
+  const scaled = a >= 1e12 ? `${(v / 1e12).toFixed(3)} trillion` : a >= 1e9 ? `${(v / 1e9).toFixed(2)} billion` : fmt(v, a >= 1000 ? 2 : 4);
+  return money ? `$${scaled}` : `${scaled}${unit && unit !== "index" ? ` ${unit}` : ""}`;
+}
+
+const PERIOD_WORD: Record<string, string> = { intraday: "hour", daily: "day", weekly: "week", monthly: "month", quarterly: "quarter", annual: "year", irregular: "period" };
 
 const MONTH_NAMES = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 
@@ -138,7 +152,7 @@ export async function mine(market: Market, plan: ResolverPlan, deps: MineDeps): 
   let framing: string;
 
   facts.push({
-    statement: `${series.title}: ${fmt(latest.value, 4)}${series.unit && series.unit !== "index" ? ` ${series.unit}` : ""} as of ${latest.date}`,
+    statement: `${series.title}: ${fmtValue(latest.value, series.unit)} as of ${latest.date}`,
     asOf: latest.date,
     value: latest.value,
     unit: series.unit,
@@ -153,7 +167,7 @@ export async function mine(market: Market, plan: ResolverPlan, deps: MineDeps): 
     if (plan.mode === "close") pYes = plan.comparator === "above" ? odds.probability : 1 - odds.probability;
     else pYes = alreadyThere ? 0.97 : odds.probability;
     framing =
-      `${plan.label} needs ${move >= 0 ? "+" : ""}${move.toFixed(1)}% (to ${fmt(plan.threshold)}) ` +
+      `${plan.label} needs ${move >= 0 ? "+" : ""}${move.toFixed(1)}% (to ${fmtValue(plan.threshold, series.unit)}) ` +
       `${plan.mode === "close" ? `to ${plan.comparator === "above" ? "close above" : "close below"} it at` : "to touch it before"} ${plan.deadline.slice(0, 10)}, ${days.toFixed(1)} days away. ` +
       `60-day realised volatility is ${(vol * 100).toFixed(2)}%/day (${(vol * Math.sqrt(365) * 100).toFixed(0)}% annualised).`;
     const wk = trend.changes.find((c) => c.periods === 7);
@@ -173,8 +187,9 @@ export async function mine(market: Market, plan: ResolverPlan, deps: MineDeps): 
       const yes = plan.comparator === "above" ? value > plan.threshold : value < plan.threshold;
       pYes = yes ? 0.99 : 0.01;
       odds = { probability: pYes, method: "already published by the statistical agency", inputs: { referencePeriod: refPeriod!, value: +value.toFixed(3) } };
-      framing = `The ${refPeriod!.slice(0, 7)} figure is already published: ${plan.transform === "level" ? "" : `${plan.transform.toUpperCase()} `}${value.toFixed(2)}${plan.transform === "level" ? "" : "%"} vs threshold ${plan.threshold}.`;
-      facts.push({ statement: framing, asOf: printed.date, value, source: sourceRef(series, printed.raw) });
+      const shown = `${value.toFixed(2)}${plan.transform === "level" ? "" : "%"}`;
+      framing = `The ${refPeriod!.slice(0, 7)} figure is already published${plan.transform === "level" ? "" : ` (${plan.transform === "yoy" ? "year-on-year" : "month-on-month"} change)`}: ${shown}, which is ${yes ? "" : "not "}${plan.comparator} the ${plan.threshold}${plan.transform === "level" ? "" : "%"} threshold.`;
+      if (printed !== latest) facts.push({ statement: `${refPeriod!.slice(0, 7)} reading: ${fmtValue(printed.value, series.unit)}`, asOf: printed.date, value: printed.value, source: sourceRef(series, printed.raw) });
     } else if (refPeriod && refPeriod.slice(0, 7) !== nextExpected.slice(0, 7)) {
       return { status: "abstain", reason: `question is about ${refPeriod.slice(0, 7)}, but the next release covers ${nextExpected.slice(0, 7)}` };
     } else {
@@ -188,7 +203,7 @@ export async function mine(market: Market, plan: ResolverPlan, deps: MineDeps): 
         `that happened in ${o.hits} of the last ${o.of} months.`;
       const base = series.observations[series.observations.length - 12];
       if (base && plan.transform === "yoy") {
-        facts.push({ statement: `Base month for next y/y comparison: ${fmt(base.value, 3)} on ${base.date}`, asOf: base.date, value: base.value, source: sourceRef(series, base.raw) });
+        facts.push({ statement: `Base month for next y/y comparison: ${fmtValue(base.value, series.unit)} on ${base.date}`, asOf: base.date, value: base.value, source: sourceRef(series, base.raw) });
       }
     }
   } else {
@@ -197,8 +212,8 @@ export async function mine(market: Market, plan: ResolverPlan, deps: MineDeps): 
     odds = trendThresholdOdds({ series, threshold: plan.threshold, periodsAhead, window: trend.window });
     pYes = plan.comparator === "above" ? odds.probability : 1 - odds.probability;
     framing =
-      `Over the last ${trend.window} observations the series is ${trend.direction} (${trend.slopePerPeriod >= 0 ? "+" : ""}${fmt(trend.slopePerPeriod, 4)} per ${series.frequency.replace(/ly$/, "")}); ` +
-      `extrapolated to ${plan.deadline.slice(0, 10)} it reaches ${fmt(Number(odds.inputs.projected), 3)} against a threshold of ${fmt(plan.threshold, 3)}.`;
+      `Over the last ${trend.window} observations the series is ${trend.direction} (${trend.slopePerPeriod >= 0 ? "+" : ""}${fmtValue(trend.slopePerPeriod, series.unit)} per ${PERIOD_WORD[series.frequency]}); ` +
+      `extrapolated to ${plan.deadline.slice(0, 10)} it reaches ${fmtValue(Number(odds.inputs.projected), series.unit)} against a threshold of ${fmtValue(plan.threshold, series.unit)}.`;
   }
 
   const computed = { ...odds.inputs, pYes: +pYes.toFixed(4), daysToDeadline: +days.toFixed(2) };
@@ -210,12 +225,12 @@ export async function mine(market: Market, plan: ResolverPlan, deps: MineDeps): 
     return { status: "abstain", reason: `market already prices this: ${pct(market.yesPrice)} vs our ${pct(pYes)}`, probability: pYes };
   }
 
-  const headline = `Primary data points to ${stance}: ${odds.method.split(":")[0]} gives P(YES) ≈ ${pct(pYes)}`;
+  const headline = `Primary data points to ${stance} (our P(YES) ≈ ${pct(pYes)}; ${odds.method.split(":")[0]})`;
   const facts0 = facts[0]!;
   const note = [
     `${headline}.`,
     `• ${facts0.statement} (${facts0.source.publisher}; raw: "${truncate(facts0.source.quote ?? "", 90)}").`,
-    ...facts.slice(1).map((f) => `• ${f.statement}.`),
+    ...facts.slice(1).map((f) => `• ${f.statement.replace(/\.$/, "")}.`),
     `• ${framing}`,
     `• Method: ${odds.method}.${market.yesPrice !== undefined ? ` Market currently implies ${pct(market.yesPrice)}.` : ""}`,
     `Source: ${facts0.source.dataUrl} (retrieved ${facts0.source.retrievedAt.slice(0, 16)}Z, sha256 ${facts0.source.contentHash.slice(0, 12)}…).`,

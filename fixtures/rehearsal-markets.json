@@ -1,0 +1,7 @@
+[
+  { "id": "rehearsal-btc-150k", "question": "Will Bitcoin close above $150,000 on December 31, 2026?", "closeTime": "2026-12-31T23:59:59Z", "evidenceCutoff": "2026-12-30T17:00:00Z", "category": "crypto", "yesPrice": 0.12 },
+  { "id": "rehearsal-eth-1k", "question": "Will Ethereum drop below $1,000 by December 31, 2026?", "closeTime": "2026-12-31T23:59:59Z", "category": "crypto", "yesPrice": 0.2 },
+  { "id": "rehearsal-cpi-oct", "question": "Will US CPI inflation for October 2026 be above 3.5%?", "closeTime": "2026-12-20T00:00:00Z", "category": "economics", "yesPrice": 0.3 },
+  { "id": "rehearsal-debt", "question": "Will US national debt exceed $41 trillion by December 31, 2026?", "closeTime": "2026-12-31T23:59:59Z", "category": "economics", "yesPrice": 0.5 },
+  { "id": "rehearsal-politics", "question": "Will the incumbent win the next general election?", "closeTime": "2026-12-31T23:59:59Z", "category": "politics" }
+]

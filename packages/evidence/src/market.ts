@@ -16,7 +16,11 @@ export interface Market {
   extra?: Record<string, unknown>;
 }
 
-export type ResolverPlan =
+/** Extra series to try, in order, if the primary one cannot be fetched. */
+type WithFallback = { fallback?: SeriesRef | SeriesRef[] };
+
+export type ResolverPlan = WithFallback &
+  (
   | {
       kind: "price";
       ref: SeriesRef;
@@ -29,7 +33,6 @@ export type ResolverPlan =
   | {
       kind: "next-print";
       ref: SeriesRef;
-      fallback?: SeriesRef;
       label: string;
       transform: "yoy" | "mom" | "level";
       threshold: number;
@@ -43,7 +46,7 @@ export type ResolverPlan =
       threshold: number;
       comparator: "above" | "below";
       deadline: string;
-    };
+    });
 
 export interface PlanResult {
   plan: ResolverPlan | null;
@@ -190,11 +193,15 @@ export function planMarket(market: Market, overrides: Record<string, ResolverPla
 
   const coinWord = Object.keys(CRYPTO).find((w) => new RegExp(String.raw`\b${w}\b`, "i").test(q));
   if (coinWord && threshold && !threshold.pct) {
-    const touch = /\b(reach|hit|touch|top|surpass|break|at any (point|time)|trade above|trade below)\b/i.test(q);
+    const touch = /\b(reach|hit|touch|top|surpass|break|drop|fall|dip|sink|at any (point|time)|trade above|trade below)\b/i.test(q);
     return {
       plan: {
         kind: "price",
         ref: { source: "coinbase", id: CRYPTO[coinWord]! },
+        fallback: [
+          { source: "kraken", id: CRYPTO[coinWord]! },
+          { source: "coingecko", id: CRYPTO[coinWord]! },
+        ],
         label: CRYPTO[coinWord]!,
         threshold: threshold.value,
         comparator: threshold.comparator,

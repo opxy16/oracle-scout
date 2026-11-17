@@ -1,0 +1,12 @@
+{
+  "name": "@oracle-scout/agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": { "oracle-scout": "./src/cli.ts" },
+  "dependencies": {
+    "@oracle-scout/evidence": "*",
+    "@oracle-scout/ledger": "*",
+    "@oracle-scout/concordium": "*"
+  }
+}

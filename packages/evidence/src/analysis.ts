@@ -184,8 +184,9 @@ export function trendThresholdOdds(args: { series: Series; threshold: number; pe
   const { slope, intercept, residualSd } = olsSlope(values);
   const projected = intercept + slope * (values.length - 1 + args.periodsAhead);
   const sd = Math.max(residualSd * Math.sqrt(1 + args.periodsAhead / values.length), 1e-9);
+  // Trend extrapolation ignores regime changes, so never claim more than 97% either way.
   return {
-    probability: clamp(1 - normCdf((args.threshold - projected) / sd)),
+    probability: Math.min(0.97, Math.max(0.03, 1 - normCdf((args.threshold - projected) / sd))),
     method: "OLS trend extrapolation with residual spread",
     inputs: { projected: +projected.toFixed(4), sd: +sd.toFixed(4), slopePerPeriod: +slope.toFixed(5), periodsAhead: args.periodsAhead },
   };

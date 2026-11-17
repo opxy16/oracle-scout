@@ -119,7 +119,7 @@ export const treasury: Source = {
       .reverse();
     return {
       ref,
-      title: String(ref.params?.title ?? `${ref.id} ${field}`),
+      title: String(ref.params?.title ?? ref.id),
       unit: String(ref.params?.unit ?? "USD"),
       frequency: guessFrequency(observations),
       observations,
@@ -178,8 +178,75 @@ export const openMeteo: Source = {
   },
 };
 
+const KRAKEN_PAIR: Record<string, string> = { BTC: "XBTUSD", DOGE: "XDGUSD" };
+
+/** Kraken public OHLC (daily). ref.id uses the Coinbase-style product, e.g. "BTC-USD". Fallback for coinbase. */
+export const kraken: Source = {
+  id: "kraken",
+  publisher: "Kraken",
+  primary: true,
+  async fetchSeries(ref, http) {
+    const [base = "BTC", quote = "USD"] = ref.id.split("-");
+    const pair = KRAKEN_PAIR[base] ?? `${base}${quote}`;
+    const url = `https://api.kraken.com/0/public/OHLC?pair=${pair}&interval=1440`;
+    const doc = await http(url);
+    const json = JSON.parse(doc.text) as { error: string[]; result: Record<string, unknown> };
+    if (json.error?.length) throw new Error(`Kraken: ${json.error.join(", ")}`);
+    const key = Object.keys(json.result).find((k) => k !== "last");
+    const rows = (key ? json.result[key] : []) as (string | number)[][];
+    const observations = rows.map((r) => ({ date: new Date(Number(r[0]) * 1000).toISOString().slice(0, 10), value: Number(r[4]), raw: JSON.stringify(r) }));
+    return {
+      ref,
+      title: `${ref.id} daily close`,
+      unit: quote,
+      frequency: "daily",
+      observations,
+      provenance: prov(this.publisher, `https://www.kraken.com/prices/${base.toLowerCase()}`, doc),
+    };
+  },
+};
+
+const GECKO_ID: Record<string, string> = {
+  BTC: "bitcoin",
+  ETH: "ethereum",
+  SOL: "solana",
+  XRP: "ripple",
+  DOGE: "dogecoin",
+  ADA: "cardano",
+  AVAX: "avalanche-2",
+  LINK: "chainlink",
+  LTC: "litecoin",
+};
+
+/** CoinGecko market chart (aggregated across exchanges). Last-resort price fallback. */
+export const coingecko: Source = {
+  id: "coingecko",
+  publisher: "CoinGecko (aggregated)",
+  primary: false,
+  async fetchSeries(ref, http) {
+    const [base = "BTC", quote = "USD"] = ref.id.split("-");
+    const id = GECKO_ID[base] ?? base.toLowerCase();
+    const url = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=${quote.toLowerCase()}&days=120&interval=daily`;
+    const doc = await http(url);
+    const json = JSON.parse(doc.text) as { prices: [number, number][] };
+    const byDay = new Map<string, Observation>();
+    for (const [ms, v] of json.prices) {
+      const date = new Date(ms).toISOString().slice(0, 10);
+      byDay.set(date, { date, value: v, raw: JSON.stringify([ms, v]) });
+    }
+    return {
+      ref,
+      title: `${ref.id} daily price`,
+      unit: quote,
+      frequency: "daily",
+      observations: [...byDay.values()],
+      provenance: prov(this.publisher, `https://www.coingecko.com/en/coins/${id}`, doc),
+    };
+  },
+};
+
 export const SOURCES: Record<string, Source> = Object.fromEntries(
-  [fred, bls, coinbase, treasury, worldBank, openMeteo].map((s) => [s.id, s]),
+  [fred, bls, coinbase, kraken, coingecko, treasury, worldBank, openMeteo].map((s) => [s.id, s]),
 );
 
 export function registerSource(source: Source): void {
