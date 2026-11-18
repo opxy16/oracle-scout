@@ -20,6 +20,12 @@ Built for two online hackathons:
 
 ---
 
+<p align="center">
+  <img src="docs/screenshots/dashboard-desktop-light.jpg" alt="Dashboard: headline, live identity checks and the chain of the latest log entries sealed on Concordium" width="640"><br>
+  <img src="docs/screenshots/owner-proof-desktop-dark.jpg" alt="Owner proof page in dark mode: the published proof, re-verified on chain" width="420">
+  <img src="docs/screenshots/evidence-phone-dark.jpg" alt="Evidence rows on a phone in dark mode" width="200">
+</p>
+
 ## Why
 
 Forecasting markets, and the AI judges behind them, reward *new, verifiable facts*. Most research agents write persuasive text. Oracle Scout does three things differently:
