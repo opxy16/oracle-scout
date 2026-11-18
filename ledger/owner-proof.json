@@ -1,0 +1,30 @@
+{
+  "format": "oracle-scout/owner-proof-record@1",
+  "ctx": {
+    "purpose": "oracle-scout/owner-proof@1",
+    "tokenId": 1253,
+    "badge": "JyP9YD4TswwGeC8X8An8Z",
+    "owner": "3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1",
+    "minAge": 18,
+    "issuedAt": "2026-11-18T00:40:48.553Z",
+    "nonce": "7d0c2c1272acfaebab004410"
+  },
+  "sig": "d086a60a1fdab934a94dee6d0759cfb7966b87df97f1d15458729cd3ef7f7038",
+  "presentation": "{\"presentationContext\":\"d57fe6844b749d25764e50494e66e07861961213e348af8b4cb225d8e1c9d641\",\"proof\":{\"created\":\"2026-11-18T00:40:53.163Z\",\"proofValue\":[],\"type\":\"ConcordiumWeakLinkingProofV1\"},\"type\":\"VerifiablePresentation\",\"verifiableCredential\":[{\"credentialSubject\":{\"id\":\"did:ccd:testnet:cred:ac969415d1a5d524fbf44bba2d4275b395b78e5fdf7f080ef26065b4025650868b87182f10e3790941a297323a35ff0b\",\"proof\":{\"created\":\"2026-11-18T00:40:53.163Z\",\"proofValue\":[{\"proof\":\"9726972a206f5dcdd47de36bf0e37bf5dac77fe3778b67b274beacaa48041b7f14857904d711d00d337e7c7e242f535c90befcaea0bde4f16ee9358e73a5a7521a7ed568dbc4deca7b9d0fcdff2cb3c0c4a6e7d346c7f750eded79a019c283d584c06992f318b8f52c6a7ff5402fc9b0530ac49d6e46eb6b787ead1863757cbe4b061b06e1cb624aaa4e56f7b335dedeb89090e355a25ae53d5ce0c27a8e15c1773d1e3293d5230fb936d5d845af8127f34c84225bf4b63dcaa782161efa5a734aea78e3a7aca8779dc2bdc43569678bb80aaf4f4467650e905d4ce28d509321385d35c743d816d224436c2157ebd67fc0fc7e49149662f44021a5704f259e2c32084a98cd35a73bc18d38f034980f3d5dd36a59b2cc4e2a96b6baa306a9cfbd00000007b2de06074ef0c7de71e3b27900bfc12abd6652b3e18a6499aabaaa5bcfaf9370e48e25f832543a602b5b6489d3e37614a88ca1214c55831643f156e3e16a31c4ff9af2829b74a1624eb7a5c2e63670f1eab47e4f9b0b705f28d69aee50cb4fd688cd71344971e7e03e5280b3cdfb54d18020e64c0cf6ab6a4a6a3580e6fa8219be978b82abddca183e856844afe8a7d981c9ab044b15a7cd2e2efc5629aceef838bec56783cba5ff077072eec824d6675e9a104f493798021864313b0bbb3395b20f3b24b295e3e72a255c3d60056f7dad85c3cdd1beb19337e234c77dba7180e02e5e5321e9765e503bffe7e4b235b894935ef0797cd0ccefd72cee10171f31c5c1e7d7a32aaa2b4e5a512febe9d9e26a9defd13309107e0ec03dbb15fb69bf8218081f6ddb4f28acd8505107f3b28fcc49dd755e4c79fa8fdb3f291f37a14fc1b7b4355d02051703b7844787856baab50a0383f7f87f884948dae81174324a8fdf8a88e1a7847d2e053fc11d2f29a15f710370e0e596b06b7afa668c37b977a58145b1871ee35fa6fc29ff1e0e062a0485c86eb077c4d45329bdc41ec7f8f36408a38d03bb1da2af1295a5accd431daddf02c6adbcdfe4d79ed40c19627afee8f662b34d7f81888f00d255f26b4eea1a4babf3844e678bd98c6ebd9d35ec78aa094a028e12fa13ad5a2b330d61e9e617ff515847146e9f9101378a21125f21789d807c2fef0a94fb387daab8a55216aafe7db8cf5ba803ce39c99de12f232d41dea6f37df821ced567297bbae381b57ece9bdc1a1744c63eb10798eb2b0fd6b3cb6700d12a1e2d815b51b7c806839a4d762d5d6c51570f7d253a686b8a4fbbdd957ed3246b36fa9171d1ec5f183b50826bb9f5b912cf5e114a4f888808a2a2cd6a900883d5c361be1fdf1daeccd4546147f2d0373dbf6b56549568ec94d7eb5c30bec4980b31986c9500094c0c3f2d70b781f5bd37b213fe76b8b70d6d8c65518662bcabb10b7cdbcb454231056fe4c661ecdedc94cff334f3c32f5d1ee935\",\"type\":\"AttributeInRange\"}],\"type\":\"ConcordiumZKProofV3\"},\"statement\":[{\"attributeTag\":\"dob\",\"lower\":\"18000101\",\"type\":\"AttributeInRange\",\"upper\":\"20081119\"}]},\"issuer\":\"did:ccd:testnet:idp:0\",\"type\":[\"VerifiableCredential\",\"ConcordiumVerifiableCredential\"]}]}",
+  "result": {
+    "ok": true,
+    "reasons": [],
+    "challenge": "d57fe6844b749d25764e50494e66e07861961213e348af8b4cb225d8e1c9d641",
+    "verifiedAt": "2026-11-18T00:40:54.276Z",
+    "statement": [
+      {
+        "attributeTag": "dob",
+        "lower": "18000101",
+        "type": "AttributeInRange",
+        "upper": "20081119"
+      }
+    ],
+    "credId": "ac969415d1a5d524fbf44bba2d4275b395b78e5fdf7f080ef26065b4025650868b87182f10e3790941a297323a35ff0b",
+    "account": "3u319bYkSSU3CeoMqyzt5nd72VpL5qF4oqmZoVTQQPLdBEqyL1"
+  }
+}

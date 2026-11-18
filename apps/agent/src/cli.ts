@@ -128,6 +128,30 @@ const commands: Record<string, () => Promise<void>> = {
     }
   },
 
+  async "owner-proof"() {
+    const path = resolve(process.env.OS_PUBLIC_LEDGER_DIR ?? "ledger", "owner-proof.json");
+    const rec = JSON.parse(await readFile(path, "utf8")) as {
+      ctx: { tokenId: number; owner: string; minAge: number; issuedAt: string };
+      presentation: string;
+      result: { ok: boolean; challenge: string; account?: string; credId?: string; statement?: unknown; verifiedAt: string };
+    };
+    if (!rec.result.ok) throw new Error("The saved owner proof did not verify; not logging it.");
+    const { createHash } = await import("node:crypto");
+    await log.append("oversight", {
+      action: "owner.proof",
+      reason: `Concordium ID zero-knowledge proof: owner of agent #${rec.ctx.tokenId} is aged ${rec.ctx.minAge}+`,
+      by: "owner (Concordium Wallet for Web)",
+      tokenId: rec.ctx.tokenId,
+      account: rec.result.account,
+      challenge: rec.result.challenge,
+      statement: rec.result.statement,
+      presentationHash: createHash("sha256").update(rec.presentation).digest("hex"),
+      provedAt: rec.ctx.issuedAt,
+      verifiedAt: rec.result.verifiedAt,
+    });
+    console.log(`Logged owner proof for agent #${rec.ctx.tokenId} (account ${rec.result.account}).`);
+  },
+
   async keygen() {
     if (process.env.OS_PACK_KEY) {
       console.log("OS_PACK_KEY already set in .env; leaving it unchanged.");

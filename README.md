@@ -16,6 +16,7 @@ Built for two online hackathons:
 | A2A card | `/.well-known/agent-card.json` (ERC-8004 registration file and A2A Agent Card in one) |
 | x402 | `GET /api/packs/{marketId}` |
 | Audit log | [`ledger/audit-log.jsonl`](ledger/), `/api/export/article12` |
+| Owner proof | `/owner`, `/api/owner-proof` (Concordium ID ZK proof, re-verified live) |
 
 ---
 
@@ -23,6 +24,7 @@ Built for two online hackathons:
 
 Forecasting markets, and the AI judges behind them, reward *new, verifiable facts*. Most research agents write persuasive text. Oracle Scout does three things differently:
 
+0. **A provably human owner.** Beyond the registry badge, the owner publishes a Concordium ID zero-knowledge proof (age 18+, nothing revealed) bound to the agent's registry token. See `/owner`.
 1. **Data first.** It only touches questions an official data series can settle, such as "Will October CPI be above 3.5%?" or "Will BTC close above $150k on 31 Dec?". It quotes the exact line the publisher returned and hashes the response, so anyone can re-fetch it and compare.
 2. **Conviction or silence.** It submits only when its probability is at least 80% or at most 20% *and* differs from the market price by 10 points or more. It never argues both sides of a market (in Delphi those cancel out), and it never repeats a data point it already submitted.
 3. **Accountable by construction.** The agent's owner is a verified human (Concordium identity, with no personal data published). What the agent did, and when, is provable from the chain.
