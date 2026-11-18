@@ -28,12 +28,12 @@ export function PublishedProof() {
 
   if (st.s === "loading")
     return (
-      <div className="panel mt-4 flex items-center gap-2 p-5 text-sm text-muted">
+      <div className="sheet mt-6 rounded-xl flex items-center gap-2 p-5 text-sm text-ink2">
         <CircleDashed className="h-4 w-4 animate-spin" /> Re-verifying the published proof on Concordium testnet…
       </div>
     );
-  if (st.s === "none") return <p className="panel mt-4 p-5 text-sm text-muted">No owner proof has been published yet.</p>;
-  if (st.s === "error") return <p className="panel mt-4 p-5 text-sm text-no">Could not check the proof: {st.msg}</p>;
+  if (st.s === "none") return <p className="sheet mt-6 rounded-xl p-5 text-sm text-ink2">No owner proof has been published yet.</p>;
+  if (st.s === "error") return <p className="sheet mt-6 rounded-xl p-5 text-sm text-oxide">Could not check the proof: {st.msg}</p>;
 
   const { live, record } = st;
   const range = live.statement?.find((x) => x.attributeTag === "dob");
@@ -43,7 +43,7 @@ export function PublishedProof() {
     [
       "Owner account",
       live.account ? (
-        <a className="font-mono text-xs text-accent hover:underline" href={`https://ccdexplorer.io/testnet/account/${live.account}`}>
+        <a className="font-mono text-xs text-ink underline underline-offset-4 hover:no-underline" href={`https://ccdexplorer.io/testnet/account/${live.account}`}>
           {live.account.slice(0, 10)}…{live.account.slice(-6)}
         </a>
       ) : (
@@ -55,22 +55,22 @@ export function PublishedProof() {
     ["Re-verified", new Date(live.verifiedAt).toUTCString()],
   ];
   return (
-    <div className={`panel mt-4 overflow-hidden ${live.ok ? "" : "border-no/50"}`}>
-      <div className={`flex items-center gap-2 border-b border-line px-5 py-3 text-sm font-medium ${live.ok ? "bg-verify/10 text-verify" : "bg-no/10 text-no"}`}>
+    <div className={`sheet mt-6 rounded-xl overflow-hidden ${live.ok ? "" : "border-oxide/50"}`}>
+      <div className={`flex items-center gap-2 border-b border-rule px-5 py-3 text-sm font-medium ${live.ok ? "bg-seal/[0.08] text-seal" : "bg-oxide/[0.08] text-oxide"}`}>
         {live.ok ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
         {live.ok ? "Valid: the agent's owner is a Concordium-verified adult" : `Not valid: ${live.reasons.join("; ")}`}
       </div>
-      <dl className="divide-y divide-line text-sm">
+      <dl className="divide-y divide-rule text-sm">
         {rows.map(([k, v]) => (
           <div key={k} className="flex items-center justify-between gap-4 px-5 py-2.5">
-            <dt className="text-muted">{k}</dt>
+            <dt className="text-ink2">{k}</dt>
             <dd className="text-right">{v}</dd>
           </div>
         ))}
       </dl>
-      <p className="border-t border-line px-5 py-3 text-xs text-muted">
-        Raw record: <a className="text-accent hover:underline" href="https://github.com/opxy16/oracle-scout/blob/main/ledger/owner-proof.json">ledger/owner-proof.json</a> · API:{" "}
-        <a className="text-accent hover:underline" href="/api/owner-proof">/api/owner-proof</a>
+      <p className="border-t border-rule px-5 py-3 text-xs text-ink2">
+        Read the raw record in <a className="text-ink underline underline-offset-4 hover:no-underline" href="https://github.com/opxy16/oracle-scout/blob/main/ledger/owner-proof.json">ledger/owner-proof.json</a>, or
+        fetch the live check from <a className="text-ink underline underline-offset-4 hover:no-underline" href="/api/owner-proof">/api/owner-proof</a>.
       </p>
     </div>
   );

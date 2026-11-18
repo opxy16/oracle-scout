@@ -2,21 +2,25 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
-export function CopyField({ value }: { value: string }) {
+export function CopyField({ value, label }: { value: string; label?: string }) {
   const [done, setDone] = useState(false);
   return (
     <button
       type="button"
+      aria-label={`Copy ${label ?? value}`}
       onClick={() => {
         navigator.clipboard?.writeText(value).then(() => {
           setDone(true);
           setTimeout(() => setDone(false), 1500);
         });
       }}
-      className="mt-3 flex w-full items-center justify-between gap-2 rounded-lg border border-line bg-bg px-3 py-2 text-left font-mono text-xs hover:border-accent"
+      className="group mt-3 flex w-full items-center justify-between gap-2 rounded-md border border-rule bg-paper px-3 py-2 text-left transition-colors hover:border-ink active:scale-[0.995]"
     >
-      <span className="truncate">{value}</span>
-      {done ? <Check className="h-3.5 w-3.5 shrink-0 text-verify" /> : <Copy className="h-3.5 w-3.5 shrink-0 text-muted" />}
+      <span className="hash truncate !text-ink">{value}</span>
+      <span className="flex shrink-0 items-center gap-1 text-xs text-ink2" aria-live="polite">
+        {done ? <Check className="h-3.5 w-3.5 text-seal" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
+        {done ? "Copied" : "Copy"}
+      </span>
     </button>
   );
 }

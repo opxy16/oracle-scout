@@ -78,38 +78,38 @@ export function OwnerProofFlow() {
   const at = order.indexOf(step);
 
   return (
-    <div className="panel mt-4 p-5">
+    <div className="sheet mt-6 rounded-xl p-5">
       <ol className="space-y-2.5">
         {steps.map(([s, label], i) => {
           const done = at > i || step === "done";
           const active = step === s;
           return (
             <li key={s} className="flex items-center gap-3 text-sm">
-              <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${done ? "bg-verify/15 text-verify" : active ? "bg-accent/15 text-accent" : "bg-line/60 text-muted"}`}>
+              <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-semibold ${done ? "bg-seal/[0.15] text-seal" : active ? "bg-tag/[0.15] text-tag" : "bg-rule text-ink2"}`}>
                 {done ? "✓" : active ? <CircleDashed className="h-3.5 w-3.5 animate-spin" /> : i + 1}
               </span>
-              <span className={done || active ? "" : "text-muted"}>{label}</span>
+              <span className={done || active ? "" : "text-ink2"}>{label}</span>
             </li>
           );
         })}
       </ol>
-      {account && <p className="mt-4 font-mono text-xs text-muted">Wallet account: {account}</p>}
-      {msg && <p className={`mt-3 text-xs ${step === "error" ? "text-no" : "text-accent"}`}>{msg}</p>}
+      {account && <p className="mt-4 font-mono text-xs text-ink2">Wallet account: {account}</p>}
+      {msg && <p className={`mt-3 text-xs ${step === "error" ? "text-oxide" : "text-tag"}`}>{msg}</p>}
       {result && (
-        <div className={`mt-4 rounded-lg border px-3 py-2 text-sm ${result.ok ? "border-verify/40 bg-verify/5" : "border-no/40 bg-no/5"}`}>
+        <div className={`mt-4 rounded-lg border px-3 py-2 text-sm ${result.ok ? "border-seal/50 bg-seal/[0.06]" : "border-oxide/50 bg-oxide/[0.06]"}`}>
           <p className="flex items-center gap-1.5 font-medium">
-            {result.ok ? <CheckCircle2 className="h-4 w-4 text-verify" /> : <XCircle className="h-4 w-4 text-no" />}
+            {result.ok ? <CheckCircle2 className="h-4 w-4 text-seal" /> : <XCircle className="h-4 w-4 text-oxide" />}
             {result.ok ? "Proof verified" : "Proof rejected"}
           </p>
-          {!result.ok && <p className="mt-1 text-xs text-muted">{result.reasons.join("; ")}</p>}
-          {result.ok && <p className="mt-1 text-xs text-muted">{result.saved ? "Saved to ledger/owner-proof.json for publishing." : "Verified. (Saving happens on the operator's machine.)"}</p>}
+          {!result.ok && <p className="mt-1 text-xs text-ink2">{result.reasons.join("; ")}</p>}
+          {result.ok && <p className="mt-1 text-xs text-ink2">{result.saved ? "Saved to ledger/owner-proof.json for publishing." : "Verified. (Saving happens on the operator's machine.)"}</p>}
         </div>
       )}
       <button
         type="button"
         onClick={run}
         disabled={step !== "idle" && step !== "done" && step !== "error"}
-        className="mt-5 inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-bg hover:opacity-90 disabled:opacity-50"
+        className="btn btn-ink mt-5 disabled:opacity-50"
       >
         <Wallet className="h-4 w-4" /> {step === "idle" ? "Prove with Concordium ID" : step === "done" || step === "error" ? "Run again" : "Working…"}
       </button>

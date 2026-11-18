@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUpRight, BadgeCheck, CircleDashed, ShieldAlert, UserRound } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, CircleDashed, ShieldAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface Agent {
@@ -10,104 +10,84 @@ interface Agent {
   registry?: { tokenId?: string; badge?: string; contract: string };
 }
 
-type Check = { state: "loading" } | { state: "none" } | { state: "ok"; data: Record<string, unknown> } | { state: "bad"; data?: Record<string, unknown>; error?: string };
-
+type Status = "checking" | "ok" | "pending" | "failed";
 const REGISTRY = "https://agent-registry-mcp.concordium.com";
 
+function StatusMark({ s }: { s: Status }) {
+  if (s === "ok") return <BadgeCheck className="h-5 w-5 shrink-0 text-seal" aria-hidden="true" />;
+  if (s === "checking") return <CircleDashed className="h-5 w-5 shrink-0 animate-spin text-ink2" aria-hidden="true" />;
+  return <ShieldAlert className={`h-5 w-5 shrink-0 ${s === "failed" ? "text-oxide" : "text-ink2"}`} aria-hidden="true" />;
+}
+
+/**
+ * Who stands behind the agent, checked live in the visitor's browser:
+ * the registry badge (Concordium's public API) and the published owner proof (our API, re-verified on chain).
+ */
 export function IdentityCard({ agent }: { agent: Agent | null }) {
   const badge = agent?.registry?.badge;
-  const [check, setCheck] = useState<Check>(badge ? { state: "loading" } : { state: "none" });
+  const [badgeS, setBadgeS] = useState<Status>(badge ? "checking" : "pending");
+  const [ownerS, setOwnerS] = useState<Status>("checking");
 
   useEffect(() => {
-    if (!badge) return;
-    fetch(`${REGISTRY}/v1/check-badge/${encodeURIComponent(badge)}?network=testnet`)
-      .then(async (r) => {
-        const data = (await r.json()) as Record<string, unknown>;
-        const ok = data.badge_valid === true || data.valid === true;
-        setCheck(ok ? { state: "ok", data } : { state: "bad", data });
-      })
-      .catch((e: Error) => setCheck({ state: "bad", error: e.message }));
+    if (badge) {
+      fetch(`${REGISTRY}/v1/check-badge/${encodeURIComponent(badge)}?network=testnet`)
+        .then((r) => r.json())
+        .then((d: Record<string, unknown>) => setBadgeS(d.badge_valid === true ? "ok" : "failed"))
+        .catch(() => setBadgeS("failed"));
+    }
+    fetch("/api/owner-proof", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => setOwnerS(!j.present ? "pending" : j.live?.ok ? "ok" : "failed"))
+      .catch(() => setOwnerS("failed"));
   }, [badge]);
 
   const owner = agent?.ownerAccount;
+  const badgeText = { checking: "Checking the registry", ok: "Verified by Concordium", pending: "Registration pending", failed: "Badge check failed" }[badgeS];
+  const ownerText = { checking: "Re-verifying the proof", ok: "Proven adult, nothing else revealed", pending: "Proof not published yet", failed: "Proof did not verify" }[ownerS];
+
   return (
-    <aside className="panel overflow-hidden">
-      <div className="border-b border-line bg-gradient-to-br from-accent/10 to-transparent p-5">
-        <p className="text-xs uppercase tracking-wider text-muted">Agent identity</p>
-        <div className="mt-3 flex items-center gap-3">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-panel ring-1 ring-line">
-            {check.state === "ok" ? <BadgeCheck className="h-7 w-7 text-verify" /> : check.state === "loading" ? <CircleDashed className="h-7 w-7 animate-spin text-muted" /> : <ShieldAlert className="h-7 w-7 text-accent" />}
-          </span>
-          <div>
-            <p className="text-lg font-semibold">{agent?.name ?? "Oracle Scout"}</p>
-            <p className="text-sm text-muted">
-              {check.state === "ok" && <span className="text-verify">Verified by Concordium</span>}
-              {check.state === "loading" && "Checking the registry…"}
-              {check.state === "none" && "Registry entry pending"}
-              {check.state === "bad" && <span className="text-no">Badge check failed</span>}
-            </p>
-          </div>
+    <dl className="divide-y divide-rule rounded-xl border border-rule bg-sheet text-sm">
+      <div className="flex items-start gap-3 p-4">
+        <StatusMark s={badgeS} />
+        <div className="min-w-0 flex-1">
+          <dt className="font-semibold">Registered agent {agent?.registry?.tokenId ? `#${agent.registry.tokenId}` : ""}</dt>
+          <dd className="text-ink2">
+            {badgeText}
+            {badge && (
+              <a className="ml-2 inline-flex items-center gap-0.5 text-ink underline-offset-4 hover:underline" href={`${REGISTRY}/v1/check-badge/${encodeURIComponent(badge)}?network=testnet`}>
+                check it <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+              </a>
+            )}
+          </dd>
         </div>
       </div>
-      <dl className="divide-y divide-line text-sm">
-        <Row k="Registry" v={agent?.registry?.contract ? `CIS-8004 ${agent.registry.contract}` : "—"} />
-        <Row k="Agent token" v={agent?.registry?.tokenId ? `#${agent.registry.tokenId}` : "—"} />
-        <Row k="Badge" v={badge ?? "—"} mono />
-        <Row
-          k="Owner account"
-          v={
-            owner ? (
-              <a className="inline-flex items-center gap-1 font-mono text-xs text-accent hover:underline" href={`https://ccdexplorer.io/testnet/account/${owner}`}>
-                {owner.slice(0, 8)}…{owner.slice(-6)} <ArrowUpRight className="h-3 w-3" />
+      <div className="flex items-start gap-3 p-4">
+        <StatusMark s={ownerS} />
+        <div className="min-w-0 flex-1">
+          <dt className="font-semibold">Human owner</dt>
+          <dd className="text-ink2">
+            {ownerText}
+            <a className="ml-2 inline-flex items-center gap-0.5 text-ink underline-offset-4 hover:underline" href="/owner">
+              see the proof <ArrowUpRight className="h-3 w-3" aria-hidden="true" />
+            </a>
+          </dd>
+        </div>
+      </div>
+      <div className="flex items-start gap-3 p-4">
+        <span className="mt-0.5 h-5 w-5 shrink-0 rounded-full border-2 border-dashed border-ink2" aria-hidden="true" />
+        <div className="min-w-0 flex-1">
+          <dt className="font-semibold">Owner account</dt>
+          <dd className="break-all">
+            {owner ? (
+              <a className="hash underline-offset-4 hover:text-ink hover:underline" href={`https://ccdexplorer.io/testnet/account/${owner}`}>
+                {owner}
               </a>
             ) : (
-              "—"
-            )
-          }
-        />
-        <Row k="Network" v={agent?.network ?? "concordium:testnet"} />
-        <Row k="Human owner" v={<OwnerProofStatus />} />
-      </dl>
-      <div className="flex items-start gap-2 border-t border-line p-4 text-xs leading-relaxed text-muted">
-        <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-        <p>
-          The owner account is backed by a Concordium identity issued by an identity provider. Nothing personal is published: accountability runs through the
-          registry to the identity provider, which can only disclose the owner under legal process.
-        </p>
+              <span className="text-ink2">Not set</span>
+            )}
+          </dd>
+        </div>
       </div>
-      {badge && (
-        <a
-          className="flex items-center justify-center gap-1 border-t border-line p-3 text-xs font-medium text-accent hover:bg-line/40"
-          href={`${REGISTRY}/v1/check-badge/${encodeURIComponent(badge)}?network=testnet`}
-        >
-          Check the badge yourself <ArrowUpRight className="h-3 w-3" />
-        </a>
-      )}
-    </aside>
-  );
-}
-
-function OwnerProofStatus() {
-  const [s, setS] = useState<"loading" | "ok" | "none" | "bad">("loading");
-  useEffect(() => {
-    fetch("/api/owner-proof", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((j) => setS(!j.present ? "none" : j.live?.ok ? "ok" : "bad"))
-      .catch(() => setS("bad"));
-  }, []);
-  const label = { loading: "checking…", ok: "age ≥ 18, proven in ZK", none: "proof pending", bad: "proof invalid" }[s];
-  return (
-    <a href="/owner" className={`inline-flex items-center gap-1 text-xs hover:underline ${s === "ok" ? "text-verify" : s === "bad" ? "text-no" : "text-muted"}`}>
-      {s === "ok" && <BadgeCheck className="h-3.5 w-3.5" />} {label} <ArrowUpRight className="h-3 w-3" />
-    </a>
-  );
-}
-
-function Row({ k, v, mono }: { k: string; v: React.ReactNode; mono?: boolean }) {
-  return (
-    <div className="flex items-center justify-between gap-4 px-5 py-2.5">
-      <dt className="text-muted">{k}</dt>
-      <dd className={`truncate text-right ${mono ? "font-mono text-xs" : ""}`}>{v}</dd>
-    </div>
+    </dl>
   );
 }
