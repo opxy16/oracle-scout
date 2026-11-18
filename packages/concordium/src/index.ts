@@ -6,6 +6,7 @@ export * from "./network.js";
 export * from "./chain.js";
 export * from "./registry.js";
 export * from "./x402.js";
+export * from "./owner-proof.js";
 
 export interface Anchorer {
   network: string;

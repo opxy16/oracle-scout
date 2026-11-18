@@ -66,6 +66,7 @@ export function IdentityCard({ agent }: { agent: Agent | null }) {
           }
         />
         <Row k="Network" v={agent?.network ?? "concordium:testnet"} />
+        <Row k="Human owner" v={<OwnerProofStatus />} />
       </dl>
       <div className="flex items-start gap-2 border-t border-line p-4 text-xs leading-relaxed text-muted">
         <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
@@ -83,6 +84,22 @@ export function IdentityCard({ agent }: { agent: Agent | null }) {
         </a>
       )}
     </aside>
+  );
+}
+
+function OwnerProofStatus() {
+  const [s, setS] = useState<"loading" | "ok" | "none" | "bad">("loading");
+  useEffect(() => {
+    fetch("/api/owner-proof", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => setS(!j.present ? "none" : j.live?.ok ? "ok" : "bad"))
+      .catch(() => setS("bad"));
+  }, []);
+  const label = { loading: "checking…", ok: "age ≥ 18, proven in ZK", none: "proof pending", bad: "proof invalid" }[s];
+  return (
+    <a href="/owner" className={`inline-flex items-center gap-1 text-xs hover:underline ${s === "ok" ? "text-verify" : s === "bad" ? "text-no" : "text-muted"}`}>
+      {s === "ok" && <BadgeCheck className="h-3.5 w-3.5" />} {label} <ArrowUpRight className="h-3 w-3" />
+    </a>
   );
 }
 

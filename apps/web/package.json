@@ -8,6 +8,7 @@
     "start": "next start -p 3100"
   },
   "dependencies": {
+    "@concordium/browser-wallet-api-helpers": "^3.3.0",
     "@oracle-scout/concordium": "*",
     "@oracle-scout/ledger": "*",
     "lucide-react": "^0.460.0",

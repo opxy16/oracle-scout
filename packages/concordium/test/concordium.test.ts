@@ -69,3 +69,30 @@ describe("RegistryMcp", () => {
     await expect(new RegistryMcp("testnet", "u", fake).checkBadge("x")).rejects.toThrow(/bad token/);
   });
 });
+
+describe("owner proof challenge", () => {
+  const base = { tokenId: 1253, owner: "OWNER", secret: "s3cret" };
+  const client = {} as never; // never reached: these checks fail before any chain call
+
+  it("binds the challenge to token, owner and time", async () => {
+    const { issueChallenge, challengeOf, ownerStatements } = await import("../src/index.js");
+    const a = issueChallenge(base);
+    expect(challengeOf(a.ctx)).toBe(a.challenge);
+    expect(issueChallenge(base).challenge).not.toBe(a.challenge); // fresh nonce
+    expect(JSON.stringify(ownerStatements(18, [0]))).toMatch(/"attributeTag":"dob"/);
+  });
+
+  it("rejects forged signatures, wrong owners and stale challenges before touching the chain", async () => {
+    const { issueChallenge, verifyOwnerProof, TESTNET } = await import("../src/index.js");
+    const c = issueChallenge({ ...base, now: new Date("2026-11-18T00:00:00Z") });
+    const common = { presentation: "{}", ctx: c.ctx, secret: base.secret, client, network: TESTNET };
+    const forged = await verifyOwnerProof({ ...common, sig: "a".repeat(64), expectedOwner: "OWNER" });
+    expect(forged.reasons.join()).toMatch(/not issued by this server/);
+    const other = await verifyOwnerProof({ ...common, sig: c.sig, expectedOwner: "SOMEONE_ELSE" });
+    expect(other.reasons.join()).toMatch(/different owner/);
+    const stale = await verifyOwnerProof({ ...common, sig: c.sig, expectedOwner: "OWNER", maxAgeMs: 60_000, now: new Date("2026-11-18T01:00:00Z") });
+    expect(stale.reasons.join()).toMatch(/expired/);
+    const tampered = await verifyOwnerProof({ ...common, ctx: { ...c.ctx, tokenId: 1 }, sig: c.sig, expectedOwner: "OWNER" });
+    expect(tampered.ok).toBe(false);
+  });
+});
